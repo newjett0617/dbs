@@ -17,28 +17,30 @@ x-basic-setting: &basic-setting
     retries: 3
 
 volumes:
-  my-volume:
-    name: my-volume
-    driver: local
+  pgsql_data:
+    external: true
 
 networks:
-  my-network:
-    name: my-network
-    driver: bridge
-    internal: true
+  pgsql:
+    external: true
 
 services:
-  my-app:
+  pgsql:
     <<: *basic-setting
-    image: docker.io/library/nginx:alpine
-    container_name: my-app
+    image: docker.io/library/postgres:13-alpine
+    container_name: pgsql
     networks:
-      - my-network
+      - pgsql
     expose:
-      - 80
-    ports:
-      - 80:80
+      - 5432
     environment:
-      - foo=bar
+      - POSTGRES_USER=${ENV_PGSQL_USERNAME}
+      - POSTGRES_PASSWORD=${ENV_PGSQL_PASSWORD}
     volumes:
-      - my-volume:/etc/nginx:rw
+      - pgsql_data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready --username=${ENV_PGSQL_USERNAME}" ]
+      interval: 30s
+      timeout: 30s
+      start_period: 10s
+      retries: 3

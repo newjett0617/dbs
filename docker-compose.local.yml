@@ -1,0 +1,6 @@
+version: "3"
+
+services:
+  pgsql:
+    ports:
+      - 0.0.0.0:5432:5432
