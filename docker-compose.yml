@@ -29,6 +29,8 @@ services:
     <<: *basic-setting
     image: docker.io/library/postgres:13-alpine
     container_name: pgsql
+    labels:
+      - autoheal=true
     networks:
       - pgsql
     expose:
